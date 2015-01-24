@@ -3,12 +3,12 @@
 ### Author:  Louise Rains
 ### Date:  January 23, 2015
 
-The purpose of this document is to outline the changes that were made to the original dataset to provide a new tidy dataset. The changes are contained in the accompanying script, run_analysis.R.
+The purpose of this document is to outline the changes that were made to the original dataset in order to provide a new tidy dataset. The changes are contained in the accompanying script, run_analysis.R.
 
 There are three libraries used for the script:
-  1. data.table
-  2. dplyr
-  3. doBy
+  1. data.table (read.table, write.table, other table functions)
+  2. dplyr (arrange(), rename())
+  3. doBy (summaryBy() )
 
 The main elements of the script combine three pairs of files.  The  pairs consist of 
 ```
@@ -18,7 +18,7 @@ X_test.txt and X_train.txt  - the measured values as described in the code book
 ```
 The original test subjects were split into two groups, with 70% of the subjects added to the training file and 30% of the subjects added to the test file.  These pairs were combined row-wise into 3 files for the subjects, activities and extrated data.  The three files were then combined column-wise into one dataset.
 
-The most extensive processing created the extracted data file, using the extract() function, which returns a small subset of the original file, where the test and train datasets are combined, the column names are read in and applied, and columns containing the text 'mean' and 'std' as part of the names are extracted.  The resulting datafram has 79 columns and 10299 rows.  
+The most extensive processing is contained in the extract() function, which returns a small subset of the original file, where the test and train datasets are combined, the column names are read in and applied, and columns containing the text 'mean' and 'std' as part of the names are extracted.  The resulting dataframe has 79 columns and 10299 rows.  
 ```
 extract <- function() {
     test <- read.table("UCI_HAR_Dataset/test/X_test.txt")
@@ -29,21 +29,23 @@ extract <- function() {
     combined[, grep("mean|std", column_names[,2])]
 }
 ```
-The final line of this function extracts all rows, but chooses columns based on whether the column_names value contains either 'mean' or 'std'.
+The final line of this function extracts all rows, but chooses columns using the grep() function to extract only those columns where the name containing either 'mean' or 'std'.
 
 Processing of the subjects is similarly done in the subjects() function:
 ```
 subjects <- function() {
     subjectsTest <- read.table("UCI_HAR_Dataset/test/subject_test.txt")
     subjectsTest <- rename(subjectsTest, subject = V1)
+    
     subjectsTrain <- read.table("UCI_HAR_Dataset/train/subject_train.txt")
     subjectsTrain <- rename(subjectsTrain, subject=V1)
+    
     rbind(subjectsTest,subjectsTrain)
 }
 ```
-When the files are read in, the subject numbers are contained in a column called 'V1'.  The rename() function is used to replace that name with 'subject'.  After those changes are made, the files are combined using rbind()
+When the files are read in, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
 
-Processing the activity files (y_test.txt and y_train.txt) has a few extra steps over what is seen in the subjects processing and is carried out in the ativityLabels() function:
+Processing the activity files (y_test.txt and y_train.txt) has a few extra steps over the subjects processing and is carried out in the ativityLabels() function:
 ```
 activityLabels <- function() {
     activityLabelsTest <- read.table("UCI_HAR_Dataset/test/y_test.txt")
@@ -68,16 +70,15 @@ The files are read in and column names replaced as in the subjects() function an
 5 STANDING
 6 LAYING
 ```
-For readability sake, the last three lines of activityLabels() read in the labels from activity_labels.txt and replace the numbers in the 'activity' column with the corresponding phrases. 
+The last three lines of activityLabels() read in text labels from activity_labels.txt and replace the numbers in the 'activity' column with the corresponding phrases. This adds to the readibility of the final file, using words instead of numbers in the activity column.
 
-Putting these together, the functions are invoked in the following lines of code:
+Putting everything together, these functions are invoked in the following lines of code, first cbind-ing the subjcts and activity labels and then binding those to the extracted data.
 ```
 complete <- cbind(subjects(), activityLabels())
 complete <- cbind(complete, extract())
 ```
-Additionally, after the files are processed by the various functions, they are bound together column-wise to create the complete dataset.
 
-The arrange() function is used to put the files in order of subject, then activity:
+Next, the arrange() function from the __dplyr__ library is used to put the files in order of subject, then activity:
 ```
 ordered <- arrange(complete, subject, activity)
 ```
