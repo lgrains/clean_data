@@ -29,7 +29,9 @@ extract <- function() {
     combined[, grep("mean|std", column_names[,2])]
 }
 ```
-Processing of the subjects files is done in the subjects() function:
+The final line of this function extracts all rows, but chooses columns based on whether the column_names value contains either 'mean' or 'std'.
+
+Processing of the subjects is similarly done in the subjects() function:
 ```
 subjects <- function() {
     subjectsTest <- read.table("UCI_HAR_Dataset/test/subject_test.txt")
@@ -41,7 +43,7 @@ subjects <- function() {
 ```
 When the files are read in, the subject numbers are contained in a column called 'V1'.  The rename() function is used to replace that name with 'subject'.  After those changes are made, the files are combined using rbind()
 
-Processing the activity files (y_test.txt and y_train.txt) has a few extra steps.  The processing is carried out in the ativityLabels9) function:
+Processing the activity files (y_test.txt and y_train.txt) has a few extra steps over what is seen in the subjects processing and is carried out in the ativityLabels() function:
 ```
 activityLabels <- function() {
     activityLabelsTest <- read.table("UCI_HAR_Dataset/test/y_test.txt")
@@ -57,7 +59,7 @@ activityLabels <- function() {
     activityNames
 }
 ```
-The files are read in and column names replaced as in the subjects() function and bound together using rbind(). At this point, the file contains numbers in the range 1:6, which actually correspond to the names of activities:
+The files are read in and column names replaced as in the subjects() function and bound together using rbind(). At this point, the file contains numbers in the range 1:6, which correspond to the names of activities, found in activity_labels.txt:
 ```
 1 WALKING
 2 WALKING_UPSTAIRS
@@ -66,9 +68,9 @@ The files are read in and column names replaced as in the subjects() function an
 5 STANDING
 6 LAYING
 ```
-For readability sake, the last three lines read in these labels from activity_labels.txt and replace the numbers in the 'activity' column with the corresponding phrases. 
+For readability sake, the last three lines of activityLabels() read in the labels from activity_labels.txt and replace the numbers in the 'activity' column with the corresponding phrases. 
 
-All of these functions are invoked in the following lines of code:
+Putting these together, the functions are invoked in the following lines of code:
 ```
 complete <- cbind(subjects(), activityLabels())
 complete <- cbind(complete, extract())
@@ -95,15 +97,19 @@ groupGsub <- function(x) {
 ```
 The gsub() function takes the character(s) to be replaced, the replacement character, and the text to replace.  The option 'fixed=TRUE' causes the pattern to be matched as is.  This is important for characters like parentheses and dashes, which have special meaning inside of regular expressions.  Parentheses normally create capture groups, e.g., but for this function, parentheses need to be removed.  'fixed=TRUE' accomplishes that.
 
+The unlist() function is used to convert the list resulting from lapply() into something that can be applied to the colnames(ordered).  Unlist() turns a list of vectors into a single vector, which is just what is needed for the column names.
+
 The final processing on this dataset is to calculate the means for each group of subject-activity measurements by  using summaryBy from the doBy library. Usage for summaryBy is as follows:
 ```
 summaryBy(formula, data=parent.frame(), id=NULL, FUN=mean, keep.names=FALSE, p2d=FALSE, order=TRUE, full.dimension=FALSE, var.names=NULL, fun.names=NULL, ...)
 ```
-In order to create the formula in this problem, we need a list of all the column names, and instructions as to which columns to group by.  To first get a list of all the column names, using the paste() function:
+In order to create the formula for this problem, we need a list of all the column names, and instructions as to which columns to group by.  To first get a list of all the column names, use the paste() function:
 ```
 columnNamesStr <- paste(colnames(ordered)[3:81], collapse="+")
 ```
-This sets up a string that looks like colname1+colname2+...+colnameJ.  The range starts at 3 to avoid adding in 'subject' and 'activity'.  Next the string is modified as follows:
+This sets up a string that looks like colname1+colname2+...+colnameN.  The range starts at 3 to avoid adding in 'subject' and 'activity'.  
+
+Next the string is modified as follows:
 ```
 formulaStr <- paste(columnNamesStr,"~ subject+activity", collapse="")
 ```
