@@ -15,13 +15,15 @@ groupGsub <- function(x) {
 #   column names are read in and applied,
 #   and the columns containing mean and std as 
 #   part of the names are extracted.
-# The resulting data frame has 81 columns and 10299 rows
+# The resulting data frame has 79 columns and 10299 rows
 extract <- function() {
     test <- read.table("UCI_HAR_Dataset/test/X_test.txt")
     train <- read.table("UCI_HAR_Dataset/train/X_train.txt")
     combined <- rbind(test, train)
+    
     column_names <- read.table("UCI_HAR_Dataset/features.txt")
     colnames(combined) <- column_names[,2]
+    
     combined[, grep("mean|std", column_names[,2])]
 }
 
@@ -30,8 +32,10 @@ extract <- function() {
 subjects <- function() {
     subjectsTest <- read.table("UCI_HAR_Dataset/test/subject_test.txt")
     subjectsTest <- rename(subjectsTest, subject = V1)
+    
     subjectsTrain <- read.table("UCI_HAR_Dataset/train/subject_train.txt") #subject labels
     subjectsTrain <- rename(subjectsTrain, subject=V1) # subject_labels
+    
     rbind(subjectsTest,subjectsTrain)
 }
 
