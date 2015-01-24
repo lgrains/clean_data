@@ -10,15 +10,17 @@ There are three libraries used for the script:
   2. dplyr (arrange(), rename())
   3. doBy (summaryBy() )
 
-The main elements of the script combine three pairs of files.  The  pairs consist of 
+The main elements of the script combine three pairs of files from the original experiment.  The  pairs consist of 
 ```
 subject_test.txt and subject_train.txt - the subject id numbers from 1 to 30
 y_test.txt and y_train.txt  - the activity numbers from 1 to 6.
 X_test.txt and X_train.txt  - the measured values as described in the code book
 ```
-The original test subjects were split into two groups, with 70% of the subjects added to the training file and 30% of the subjects added to the test file.  These pairs were combined row-wise into 3 files for the subjects, activities and extrated data.  The three files were then combined column-wise into one dataset.
+####Overview
+In the original experiment, the subjects were split into two groups, with 70% of the subjects added to the training file and 30% of the subjects added to the test file.  These pairs of files were combined row-wise into 3 files for the subjects, activities and extracted data.  The three files were then combined column-wise into one dataset.
 
-The most extensive processing is contained in the extract() function, which returns a small subset of the original file, where the test and train datasets are combined, the column names are read in and applied, and columns containing the text 'mean' and 'std' as part of the names are extracted.  The resulting dataframe has 79 columns and 10299 rows.  
+####The extract() function
+The most extensive processing is contained in the extract() function, which returns a small subset of the original files.  First, the test and train datasets are read in and combined, using rbind. Next, the column names are read in and applied, and lastly, columns containing the text 'mean' and 'std' as part of the name of the column are extracted, using the grep() function.  The resulting dataframe has 79 columns and 10299 rows.  
 ```
 extract <- function() {
     test <- read.table("UCI_HAR_Dataset/test/X_test.txt")
@@ -29,9 +31,9 @@ extract <- function() {
     combined[, grep("mean|std", column_names[,2])]
 }
 ```
-The final line of this function extracts all rows, but chooses columns using the grep() function to extract only those columns where the name contains either 'mean' or 'std'.
 
-Processing of the subjects is similarly done in the subjects() function:
+####The subjects() function
+Processing of the subject files is done in the subjects() function:
 ```
 subjects <- function() {
     subjectsTest <- read.table("UCI_HAR_Dataset/test/subject_test.txt")
@@ -43,9 +45,10 @@ subjects <- function() {
     rbind(subjectsTest,subjectsTrain)
 }
 ```
-After the files are read into the table, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
+After the files are read into the subjectsTest or subjectsTrain tables, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
 
-Processing the activity files (y_test.txt and y_train.txt) has a few extra steps over the subjects processing and is carried out in the ativityLabels() function:
+####The activityLabels() function
+Processing the activity files (y_test.txt and y_train.txt) is similar to the subjects() function.  The files are read into tables, the column name 'V1' is replaced, this time with the label 'activity, and the test and train tables are combined using rbind.  
 ```
 activityLabels <- function() {
     activityLabelsTest <- read.table("UCI_HAR_Dataset/test/y_test.txt")
@@ -61,7 +64,7 @@ activityLabels <- function() {
     activityNames
 }
 ```
-The files are read in and column names replaced as in the subjects() function and bound together using rbind(). At this point, the file contains numbers in the range 1:6, which correspond to the names of activities, found in activity_labels.txt:
+The activityNames table now contains numbers in the range 1:6, which correspond to the names of activities found in activity_labels.txt:
 ```
 1 WALKING
 2 WALKING_UPSTAIRS
@@ -70,9 +73,10 @@ The files are read in and column names replaced as in the subjects() function an
 5 STANDING
 6 LAYING
 ```
-The last three lines of activityLabels() read in text labels from activity_labels.txt and replace the numbers in the 'activity' column with the corresponding phrases. This adds to the readibility of the final file, using words instead of numbers in the activity column.
+The last three lines of activityLabels() read in text labels from activity_labels.txt and replace the numbers in the 'activity' column with the correct activity name. Using names instead of numbers adds to the readibility of the final file.
 
-Putting everything together, these functions are invoked in the following lines of code, first cbind-ing the subjcts and activity labels and then binding those to the extracted data.
+####Calling the functions to create the new table
+Putting everything together, these 3 functions are invoked in the following lines of code, first cbind-ing the subjects and activity labels and then binding those to the extracted data.
 ```
 complete <- cbind(subjects(), activityLabels())
 complete <- cbind(complete, extract())
@@ -96,15 +100,17 @@ groupGsub <- function(x) {
     x <- gsub( "-", "", x, fixed=TRUE)
 }
 ```
-The gsub() function takes the character(s) to be replaced, the replacement character, and the text to replace.  The option 'fixed=TRUE' causes the pattern to be matched as is.  This is important for characters like parentheses and dashes, which have special meaning inside of regular expressions.  Parentheses normally create capture groups, e.g., but for this function, parentheses need to be removed.  'fixed=TRUE' accomplishes that.
+The gsub() function takes the character(s) to be replaced, the replacement character, and the text to replace.  The option 'fixed=TRUE' causes the pattern to be matched 'as is'.  This is important for characters like parentheses and dashes, which have special meaning inside of regular expressions.  For example, parentheses normally create capture groups, but for this function, parentheses need to be removed.  'fixed=TRUE' accomplishes that.
 
-The unlist() function is used to convert the list resulting from lapply() into something that can be applied to the colnames(ordered).  Unlist() turns a list of vectors into a single vector, which is just what is needed for the column names.
+After the new list is produced by lapply, it needs to be converted into a vector that can replace the original column names. The unlist() function turns a list into a single vector, which is just what is needed for the column names.
 
-The final processing on this dataset is to calculate the means for each group of subject-activity measurements by  using summaryBy from the doBy library. Usage for summaryBy is as follows:
+####Final processing - calculating the means for each group.
+The final processing on this dataset is to calculate the means for each group of subject-activity measurements by  using summaryBy from the __doBy__ library. Usage for summaryBy is as follows:
 ```
 summaryBy(formula, data=parent.frame(), id=NULL, FUN=mean, keep.names=FALSE, p2d=FALSE, order=TRUE, full.dimension=FALSE, var.names=NULL, fun.names=NULL, ...)
 ```
-In order to create the formula for this problem, we need a list of all the column names, and instructions as to which columns to group by.  To first get a list of all the column names, use the paste() function:
+#####The _formula_ argument
+In order to create the formula for this problem, we need a list of all the column names, together with instructions as to which columns to group by.  To first get a list of all the column names, use the paste() function:
 ```
 columnNamesStr <- paste(colnames(ordered)[3:81], collapse="+")
 ```
