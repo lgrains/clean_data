@@ -48,7 +48,7 @@ subjects <- function() {
 After the files are read into the subjectsTest or subjectsTrain tables, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
 
 ####The activityLabels() function
-Processing the activity files (y_test.txt and y_train.txt) is similar to the subjects() function.  The files are read into tables, the column name 'V1' is replaced, this time with the label 'activity, and the test and train tables are combined using rbind.  
+Processing the activity files (y_test.txt and y_train.txt) is similar to the subjects() function.  The files are read into tables, the column name 'V1' is replaced, this time with the label 'activity', and the test and train tables are combined using rbind.  
 ```
 activityLabels <- function() {
     activityLabelsTest <- read.table("UCI_HAR_Dataset/test/y_test.txt")
