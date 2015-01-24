@@ -3,7 +3,7 @@
 ### Author:  Louise Rains
 ### Date:  January 23, 2015
 
-The purpose of this file is to outline the changes that were made to the original dataset to provide a new tidy dataset. The changes are contained in the accompanying script, run_analysis.R.
+The purpose of this document is to outline the changes that were made to the original dataset to provide a new tidy dataset. The changes are contained in the accompanying script, run_analysis.R.
 
 There are three libraries used for the script:
   1. data.table
