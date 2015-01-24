@@ -110,7 +110,7 @@ The final processing on this dataset is to calculate the means for each group of
 summaryBy(formula, data=parent.frame(), id=NULL, FUN=mean, keep.names=FALSE, p2d=FALSE, order=TRUE, full.dimension=FALSE, var.names=NULL, fun.names=NULL, ...)
 ```
 #####The _formula_ argument
-The formula argument is key to making summaryBy work correctly.  It consists of two parts - the column names to be affected, joined by '=' signs, followed by the columns to group by, also joined by '+' signs.  The two groups of column names are separated by the '~' sign. 
+The formula argument is key to making summaryBy work correctly.  It consists of two parts - the column names to be affected, joined by '+' signs, followed by the columns to group by, also joined by '+' signs.  The two groups of column names are separated by the '~' sign. 
 
 In order to create the formula for this problem, we need a list of all the data column names, together with instructions as to which columns to group by.  To first get a list of all the column names, use the paste() function:
 ```
