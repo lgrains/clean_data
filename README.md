@@ -20,7 +20,7 @@ X_test.txt and X_train.txt  - the measured values as described in the code book
 In the original experiment, the subjects were split into two groups, with 70% of the subjects added to the training file and 30% of the subjects added to the test file.  These pairs of files were combined row-wise into 3 files for the subjects, activities and extracted data.  The three files were then combined column-wise into one dataset.
 
 ####The extract() function
-The most extensive processing is contained in the extract() function, which returns a small subset of the original files.  First, the test and train datasets are read in and combined, using rbind. Next, the column names are read in and applied, and lastly, columns containing the text 'mean' and 'std' as part of the name of the column are extracted, using the grep() function.  The resulting dataframe has 79 columns and 10299 rows.  
+The most extensive processing is contained in the extract() function, which returns a small subset of the original files.  First, the test and train datasets are read in and combined, using rbind. Next, the column names are read in and applied, and lastly, columns containing the text 'mean' and 'std' as part of the column name are extracted, using the grep() function.  The resulting dataframe has 79 columns and 10299 rows.  
 ```
 extract <- function() {
     test <- read.table("UCI_HAR_Dataset/test/X_test.txt")
