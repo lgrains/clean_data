@@ -91,7 +91,7 @@ The next step involves replacing the column names with more descriptive names by
 ```
 colnames(ordered) <- unlist(lapply(colnames(ordered), groupGsub))
 ```
-This uses lapply() on the list of colnames, calling a user-defined function, groupGsub():
+This step uses lapply() on the list of colnames, calling a user-defined function, groupGsub():
 ```
 groupGsub <- function(x) {
     x <- gsub( "-m", "M", x)
