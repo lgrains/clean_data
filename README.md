@@ -29,7 +29,7 @@ extract <- function() {
     combined[, grep("mean|std", column_names[,2])]
 }
 ```
-The final line of this function extracts all rows, but chooses columns using the grep() function to extract only those columns where the name containing either 'mean' or 'std'.
+The final line of this function extracts all rows, but chooses columns using the grep() function to extract only those columns where the name contains either 'mean' or 'std'.
 
 Processing of the subjects is similarly done in the subjects() function:
 ```
@@ -43,7 +43,7 @@ subjects <- function() {
     rbind(subjectsTest,subjectsTrain)
 }
 ```
-When the files are read in, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
+After the files are read into the table, the subject numbers are contained in a column called 'V1'.  The rename() function from the __dplyr__ library is used to replace V1 with 'subject'.  After those changes are made, the files are combined using rbind()
 
 Processing the activity files (y_test.txt and y_train.txt) has a few extra steps over the subjects processing and is carried out in the ativityLabels() function:
 ```
@@ -167,6 +167,6 @@ subject	activity	tBodyAccMeanX.mean	tBodyAccMeanY.mean	tBodyAccMeanZ.mean	tBodyA
 6	WALKING_DOWNSTAIRS	0.277045258145833	-0.019536840063125	-0.107209356208333	0.383681639791667
 6	WALKING_UPSTAIRS	0.268229355098039	-0.0272425385070588	-0.122082438784314	-0.0501350188513725
 ```
-
+![alt txt] (/screen_capture_final_data.png)
 
 
